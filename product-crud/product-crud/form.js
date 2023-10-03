@@ -1,10 +1,10 @@
 export const formProps = {
   formData: {
     type: Object,
-    required: true
+    required: true,
   },
   loading: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 }
