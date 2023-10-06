@@ -52,3 +52,55 @@ showMessage('hello', (close) => {
 ```
 
 这样就省去了一堆数据定义且分散在 script 和 template 中的麻烦。
+
+我们定义一个 showMessage 函数，用于挂载 Message 组件。
+
+```javascript
+function showMessage(msg, handler) {
+  // 渲染挂载组件
+  const container = document.createElement('div')
+  document.body.appendChild(container)
+
+  const app = createApp(Message, {
+    msg,
+    onClick() {
+      const close = () => { // 关闭组件
+        app.unmount(container)
+        container.remove()
+      }
+      handler && handler(close)
+    },
+  }).mount(container)
+}
+```
+
+我们用 createApp 挂载 Message 组件配置对象，并在 click 事件的 handler 中传入 close 函数，把关闭组件的控制权交给用户。
+
+然后，为了让所有相关代码都集中在一个 Message.js 中，我们不把 Message 组件写在 vue 文件中，而是使用 jsx。
+
+```jsx
+const Message = {
+  props: {
+    msg: {
+      type: String,
+      default: 'hello world',
+    },
+  },
+  render(ctx) {
+    const { $props, $emit } = ctx
+    // return createElementVNode('h1', null, $props.msg)
+    return (
+      <div class="message">
+        <h1>{$props.msg}</h1>
+        <button click={$emit('onClick')}>确定</button>
+      </div>
+    )
+  },
+}
+```
+
+这里需要注意的是 jsx 的语法和 vue 模板的差异。
+
+此外，从这里例子还可以看出，无论是 vue 单文件组件还是 jsx，这些都是为方便开发者而提供的语法糖，它们都是给编译器看的。
+
+所谓组件其实就是对象，所谓 template，jsx 都是用来创建 vnode 的 render 函数。
